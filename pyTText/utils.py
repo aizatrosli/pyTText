@@ -1,6 +1,8 @@
 from datetime import datetime
+import pandas as pd
 import os, sys, time
 import nltk, re, string
+
 
 class TextLibrary(object):
     def __init__(self):
@@ -93,3 +95,23 @@ class TextTransform(object):
         df['score'] = df["positive_count"] - df["negative_count"]
         df = df.apply(self.sentimentscore, axis=1)
         return df
+
+    def splituser(self, df, usercol='handle'):
+        '''
+        split df based on tweeter
+        :param df: target dataframe
+        :param usercol: column name for tweeter/handler
+        :return: list of df with tweeter
+        '''
+        dfs = dict(tuple(df.groupby(usercol)))
+        return {x:dfs[x] for x in dfs}
+
+
+class Session(object):
+    def __init__(self):
+        self.name = None
+        self.train_X = None
+        self.train_y = None
+        self.test_X = None
+        self.test_y = None
+        self.model = None
