@@ -1,11 +1,15 @@
 # pyTText #
 
-#####**pyThoughtText**
+##**pyThoughtText**
 
-u wan sum magic
+Twitter sentiment analysis using lexicon and DTM. 
 
-####Requirements
+###Requirements
 
 * pip install nltk, tqdm, plotly
 
-sentiment analysis using crap ml. the end.
+###How to run
+```bash
+python pyttext.py
+```
+
