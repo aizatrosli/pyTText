@@ -1,4 +1,7 @@
-#pyTText
-####pyThoughtText
+# pyTText #
+#####**pyThoughtText**
+u wan sum magic
+####Requirements
+* pip install nltk, tqdm, plotly
 
-sentimental analysis using crap ml. the end.
+sentiment analysis using crap ml. the end.
