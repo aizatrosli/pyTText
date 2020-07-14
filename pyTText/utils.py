@@ -161,6 +161,7 @@ class Model(object):
         self.model=None
         self.name=None
         self.params=None
+        self.metric={}
         self.actual=[]
         self.predict=[]
 

@@ -151,7 +151,33 @@ class TTrain(object):
             'precision_score': precision_score(y_actual, y_pred, average='macro'),
         }
 
+    def summarymetric(self):
+        '''
+        summary classification metric. please run training first!
+        :return: metric report dataframe
+        '''
+        tarr = []
+        for sess, obj in self.sessions.items():
+            sarr = []
+            for name, model in obj.models.items():
+                tdi = model.metric
+                if not tdi:
+                    raise Exception('Please run training!')
+                tdi['session'] = sess
+                tdi['model'] = model.name
+                sarr.append(tdi)
+            sdf = pd.DataFrame(sarr)
+            self.sessions[sess].bestmodel = sdf.nlargest(1, 'accuracy_score')['model'].values.item()
+            tarr+=sarr
+        tdf = pd.DataFrame(tarr)
+        tdf = tdf.sort_values('accuracy_score')
+        return tdf
+
     def summarysentiment(self):
+        '''
+        sentiment distribution based on session
+        :return: report dataframe
+        '''
         if not self.sessions:
             self.splitdata()
             #raise Exception('Please execute splitdata!')
@@ -193,6 +219,13 @@ class TInfer(object):
             return self.sessions
 
     def predict(self, text, modelname, session=None):
+        '''
+        predict text sentiment. modelname is needed
+        :param text: string of text or list of text
+        :param modelname: model or use session.model
+        :param session: session name. default random pick session
+        :return: sentiment result
+        '''
         if type(text) is str:
             text = [text]
         if session is None:
