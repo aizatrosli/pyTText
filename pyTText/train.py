@@ -1,4 +1,4 @@
-from pyTText.utils import *
+from .utils import *
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import *
 from sklearn.model_selection import *
@@ -91,10 +91,12 @@ class TTrain(object):
         '''
         self.defaultmodel(model)
         if not self.sessions:
-            raise Exception('Please execute splitdata!')
+            self.splitdata()
+            #raise Exception('Please execute splitdata!')
         for session,data in self.sessions.items():
             for name,model in self.model.items():
-                print('Session:{0}\tModel:{1}'.format(session, name))
+                print('Session:{0}\tModel:{1}\t\t\tStatus(Running)'.format(session,name))
+                starttime = datetime.now()
                 self.sessions[session].models[name] = Model()
                 self.sessions[session].models[name].name = name
                 self.sessions[session].models[name].model = RandomizedSearchCV(model['model'], param_distributions=model['params'], n_iter=n_iter, n_jobs=n_jobs)
@@ -103,6 +105,7 @@ class TTrain(object):
                 self.sessions[session].models[name].predict = self.sessions[session].models[name].model.predict(self.sessions[session].X_test)
                 self.sessions[session].models[name].actual = self.sessions[session].y_test.values.ravel()
                 self.sessions[session].models[name].metric = self.metric(self.sessions[session].models[name].actual, self.sessions[session].models[name].predict)
+                print('Session:{0}\tModel:{1}\t\t\tStatus(Finished {2}sec)'.format(session,name,(datetime.now()-starttime).total_seconds()))
 
     def train(self, model=None, randomparams=False):
         '''
@@ -113,12 +116,14 @@ class TTrain(object):
         '''
         self.defaultmodel(model)
         if not self.sessions:
-            raise Exception('Please execute splitdata!')
+            self.splitdata()
+            #raise Exception('Please execute splitdata!')
         for session, data in self.sessions.items():
             for name, model in self.model.items():
+                print('Session:{0}\tModel:{1}\t\t\tStatus(Running)'.format(session,name))
+                starttime = datetime.now()
                 self.sessions[session].models[name] = Model()
                 self.sessions[session].models[name].name = name
-                print('Session:{0}\tModel:{1}'.format(session, name))
                 self.sessions[session].models[name].model = model['model']
                 if randomparams and model['params']:
                     self.sessions[session].models[name].params = ParameterSampler(model['params'], n_iter=1, random_state=self.seed)
@@ -127,6 +132,7 @@ class TTrain(object):
                 self.sessions[session].models[name].predict = self.sessions[session].models[name].model.predict(self.sessions[session].X_test)
                 self.sessions[session].models[name].actual = self.sessions[session].y_test.values.ravel()
                 self.sessions[session].models[name].metric = self.metric(self.sessions[session].models[name].actual, self.sessions[session].models[name].predict)
+                print('Session:{0}\tModel:{1}\t\t\tStatus(Finished {2}sec)'.format(session,name,(datetime.now()-starttime).total_seconds()))
 
     def metric(self, y_actual, y_pred):
         '''
@@ -137,8 +143,22 @@ class TTrain(object):
         '''
         return {
             'accuracy_score': accuracy_score(y_actual, y_pred),
-            'f1_score': f1_score(y_actual, y_pred),
-            'roc_auc_score': roc_auc_score(y_actual, y_pred),
-            'roc_curve': roc_curve(y_actual, y_pred)
+            'f1_score': f1_score(y_actual, y_pred, average='macro'),
+            'recall_score': recall_score(y_actual, y_pred, average='macro'),
+            'precision_score': precision_score(y_actual, y_pred, average='macro'),
         }
+
+    def summarysentiment(self):
+        if not self.sessions:
+            self.splitdata()
+            #raise Exception('Please execute splitdata!')
+        sarr = []
+        iarr = []
+        for session, data in self.sessions.items():
+            sarr.append(data.y_test['sentiment'].value_counts().to_dict())
+            iarr.append(session+'_test')
+            sarr.append(data.y_train['sentiment'].value_counts().to_dict())
+            iarr.append(session+'_train')
+        return pd.DataFrame(sarr, index=iarr)
+
 
