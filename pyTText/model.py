@@ -235,10 +235,10 @@ class TInfer(object):
         dtm = pd.DataFrame(vec.toarray(), columns=vectorizer.get_feature_names())
         pred = self.sessions[session].models[modelname].model.predict(dtm)
         preddf = pd.DataFrame()
-        preddf['session'] = session
-        preddf['model'] = modelname
         preddf['text'] = text
         preddf['sentiment'] = ["negative" if i == 3 else 'positive' if i == 2 else "neutral" for i in pred]
+        preddf['session'] = str(session)
+        preddf['model'] = str(modelname)
         return preddf
 
 
