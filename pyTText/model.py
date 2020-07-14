@@ -42,7 +42,7 @@ class TTrain(object):
         self.sessions = {}
         self.model = None
 
-    def splitdata(self, test=None):
+    def splitdata(self, test=None, dtm=None):
         '''
         split data. if there is multiple session then split by session.
         :return:
@@ -53,6 +53,7 @@ class TTrain(object):
             ycol = df[[self.target]]
             self.sessions[session] = Session()
             self.sessions[session].name = session
+            self.sessions[session].dtm = dtm
             self.sessions[session].X_train, self.sessions[session].X_test, self.sessions[session].y_train, self.sessions[session].y_test = train_test_split(Xcol, ycol, test_size=self.testratio, stratify=df[[self.stratify]], random_state=self.seed)
 
     def defaultmodel(self, model):
@@ -102,7 +103,7 @@ class TTrain(object):
                 self.sessions[session].models[name].name = name
                 self.sessions[session].models[name].model = RandomizedSearchCV(model['model'], param_distributions=model['params'], n_iter=n_iter, n_jobs=n_jobs)
                 self.sessions[session].models[name].model.fit(self.sessions[session].X_train, self.sessions[session].y_train.values.ravel())
-                self.sessions[session].models[name].params = self.sessions[session].model[name].best_params_
+                self.sessions[session].models[name].params = self.sessions[session].model[name].model.best_params_
                 self.sessions[session].models[name].predict = self.sessions[session].models[name].model.predict(self.sessions[session].X_test)
                 self.sessions[session].models[name].actual = self.sessions[session].y_test.values.ravel()
                 self.sessions[session].models[name].metric = self.metric(self.sessions[session].models[name].actual, self.sessions[session].models[name].predict)
@@ -163,5 +164,37 @@ class TTrain(object):
         sdf = pd.DataFrame(sarr, index=iarr)
         sdf = sdf.rename(columns={1: "neutral", 2: "positive", 3: "negative"})
         return sdf
+
+    def save_session(self,picklename='ttsessions.pkl'):
+        import pickle as pkl
+        with open(picklename, 'wb') as fp:
+            pkl.dump(self.sessions, fp)
+        return picklename
+
+    def load_session(self,picklename='ttsessions.pkl'):
+        import pickle as pkl
+        with open(picklename, 'wb') as fp:
+            self.sessions = None
+            self.sessions = pkl.load(fp)
+            return self.sessions
+
+
+class TInfer(object):
+    def __init__(self, session=None):
+        self.sessions = session
+
+    def load_session(self,picklename='ttsessions.pkl'):
+        import pickle as pkl
+        with open(picklename, 'wb') as fp:
+            self.sessions = None
+            self.sessions = pkl.load(fp)
+            return self.sessions
+
+    def predict(self, text, modelname, session=None):
+        if session is None:
+            vectorizer = self.sessions.values()[0].dtm
+            vec = vectorizer.transform(text)
+            dtm = pd.DataFrame(vec.toarray(), columns=vectorizer.get_feature_names())
+            return self.sessions.values()[0].models[modelname].model.predict(dtm)
 
 

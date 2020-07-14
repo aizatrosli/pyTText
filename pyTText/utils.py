@@ -57,6 +57,7 @@ class TextTransform(object):
         self.pattern = pattern
         self.hashtag = hashtag
         self.mention = mention
+        self.vectorizer = None
         self.stopword = stopwords.words(lang)
 
     def process(self, df, textcol):
@@ -142,15 +143,16 @@ class TextTransform(object):
         :return: dataframe document matrix term
         '''
         from sklearn.feature_extraction.text import CountVectorizer
-        documents  = df[self.target].tolist()
+        documents = df[self.target].tolist()
         if 'sentiment' not in df.columns.tolist():
             raise Exception('MF please run opinion score first!')
         vectorizer = CountVectorizer()
         vec = vectorizer.fit_transform(documents)
-        dtm = pd.DataFrame(vec.toarray(),columns = vectorizer.get_feature_names())
-        dtm = df[[self.target,"sentiment"]].merge(dtm,left_index = True,right_index = True,how = "left")
+        self.vectorizer = vectorizer
+        dtm = pd.DataFrame(vec.toarray(), columns=vectorizer.get_feature_names())
+        dtm = df[[self.target,"sentiment"]].merge(dtm, left_index=True, right_index=True, how="left")
         dtm["sentiment"] = dtm["sentiment"].map({"neutral" : 1,"positive" : 2,"negative" : 3})
-        dtm = dtm.rename(columns = {"text_x": "text"})
+        dtm = dtm.rename(columns={"text_x": "text"})
         return dtm
 
 
@@ -186,6 +188,7 @@ class Session(object):
         self.y_test = None
         self.models = {}
         self.params = None
+        self.dtm = None
 
     def summary(self):
         '''
