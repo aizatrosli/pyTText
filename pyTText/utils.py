@@ -75,7 +75,7 @@ class TextTransform(object):
             df["accounts"] = df[textcol].str.findall(self.pattern['mention'])
             df[textcol] = df[textcol].str.replace(self.pattern['mention'], " ")
         df[textcol] = df[textcol].str.lower() if self.cases == 'lower' else df[textcol]
-        df[textcol] = df[textcol].apply(lambda x:re.split('https:\/\/.*',str(x))[0])
+        df[textcol] = df[textcol].apply(lambda x:re.split(r'https:\/\/.*',str(x))[0])
         for tag, pat in self.pattern.items():
             df[textcol] = df[textcol].str.replace(pat, " ")
         df[textcol] = df[textcol].progress_apply(lambda x: " ".join([i for i in x.split() if i not in self.stopword]))
@@ -154,6 +154,30 @@ class TextTransform(object):
         return dtm
 
 
+class Model(object):
+    def __init__(self):
+        self.model=None
+        self.name=None
+        self.params=None
+        self.actual=[]
+        self.predict=[]
+
+    def __eq__(self, other):
+        if not isinstance(other, Model):
+            return False
+        if self.model == other.model and self.name == other.name and self.predict == other.predict:
+            return True
+        else:
+            return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __str__(self):
+        predict = '\n'.join(self.predict) if type(self.predict) is list else '\n'.join(self.predict.values.tolist())
+        return "[" + str(self.name) + "\n" + predict + "\n" + str(self.model) + "]"
+
+
 class Session(object):
     def __init__(self):
         '''
@@ -164,7 +188,7 @@ class Session(object):
         self.y_train = None
         self.X_test = None
         self.y_test = None
-        self.model = {}
+        self.models = {}
         self.params = None
 
     def summary(self):

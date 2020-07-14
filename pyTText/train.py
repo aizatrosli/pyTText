@@ -91,14 +91,18 @@ class TTrain(object):
         '''
         self.defaultmodel(model)
         if not self.sessions:
-            self.splitdata()
-            #raise Exception('Please execute splitdata!')
-        for session, data in self.sessions.items():
-            for name, model in self.model.items():
+            raise Exception('Please execute splitdata!')
+        for session,data in self.sessions.items():
+            for name,model in self.model.items():
                 print('Session:{0}\tModel:{1}'.format(session, name))
-                self.sessions[session].model[name] = RandomizedSearchCV(model['model'], param_distributions=model['params'], n_iter=n_iter, n_jobs=n_jobs)
-                self.sessions[session].model[name].fit(self.sessions[session].X_train, self.sessions[session].y_train)
-                self.sessions[session].model[name].params = self.sessions[session].model[name].best_params_
+                self.sessions[session].models[name] = Model()
+                self.sessions[session].models[name].name = name
+                self.sessions[session].models[name].model = RandomizedSearchCV(model['model'], param_distributions=model['params'], n_iter=n_iter, n_jobs=n_jobs)
+                self.sessions[session].models[name].model.fit(self.sessions[session].X_train, self.sessions[session].y_train.values.ravel())
+                self.sessions[session].models[name].params = self.sessions[session].model[name].best_params_
+                self.sessions[session].models[name].predict = self.sessions[session].models[name].model.predict(self.sessions[session].X_test)
+                self.sessions[session].models[name].actual = self.sessions[session].y_test.values.ravel()
+                self.sessions[session].models[name].metric = self.metric(self.sessions[session].models[name].actual, self.sessions[session].models[name].predict)
 
     def train(self, model=None, randomparams=False):
         '''
@@ -109,15 +113,32 @@ class TTrain(object):
         '''
         self.defaultmodel(model)
         if not self.sessions:
-            self.splitdata()
-            #raise Exception('Please execute splitdata!')
+            raise Exception('Please execute splitdata!')
         for session, data in self.sessions.items():
             for name, model in self.model.items():
+                self.sessions[session].models[name] = Model()
+                self.sessions[session].models[name].name = name
                 print('Session:{0}\tModel:{1}'.format(session, name))
-                self.sessions[session].model[name] = model['model']
+                self.sessions[session].models[name].model = model['model']
                 if randomparams and model['params']:
-                    self.sessions[session].model[name].params = ParameterSampler(model['params'], n_iter=1, random_state=self.seed)
-                    self.sessions[session].model[name].set_params(self.sessions[session].params)
-                self.sessions[session].model[name] = model['model']
-                self.sessions[session].model[name].fit(self.sessions[session].X_train, self.sessions[session].y_train)
+                    self.sessions[session].models[name].params = ParameterSampler(model['params'], n_iter=1, random_state=self.seed)
+                    self.sessions[session].models[name].model.set_params(self.sessions[session].params)
+                self.sessions[session].models[name].model.fit(self.sessions[session].X_train, self.sessions[session].y_train.values.ravel())
+                self.sessions[session].models[name].predict = self.sessions[session].models[name].model.predict(self.sessions[session].X_test)
+                self.sessions[session].models[name].actual = self.sessions[session].y_test.values.ravel()
+                self.sessions[session].models[name].metric = self.metric(self.sessions[session].models[name].actual, self.sessions[session].models[name].predict)
+
+    def metric(self, y_actual, y_pred):
+        '''
+        metric for classification
+        :param y_actual: target's actual testing data
+        :param y_pred: target's predict testing data
+        :return: dict of metrics
+        '''
+        return {
+            'accuracy_score': accuracy_score(y_actual, y_pred),
+            'f1_score': f1_score(y_actual, y_pred),
+            'roc_auc_score': roc_auc_score(y_actual, y_pred),
+            'roc_curve': roc_curve(y_actual, y_pred)
+        }
 
