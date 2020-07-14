@@ -1,4 +1,5 @@
 from .utils import *
+import random
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import *
 from sklearn.model_selection import *
@@ -180,7 +181,8 @@ class TTrain(object):
 
 
 class TInfer(object):
-    def __init__(self, session=None):
+    def __init__(self, session=None, seed=100):
+        random.seed(seed)
         self.sessions = session
 
     def load_session(self,picklename='ttsessions.pkl'):
@@ -192,9 +194,12 @@ class TInfer(object):
 
     def predict(self, text, modelname, session=None):
         if session is None:
-            vectorizer = self.sessions.values()[0].dtm
-            vec = vectorizer.transform(text)
-            dtm = pd.DataFrame(vec.toarray(), columns=vectorizer.get_feature_names())
-            return self.sessions.values()[0].models[modelname].model.predict(dtm)
+            session = random.choice(list(self.sessions.keys()))
+        vectorizer = self.sessions[session].dtm
+        vec = vectorizer.transform([text])
+        dtm = pd.DataFrame(vec.toarray(), columns=vectorizer.get_feature_names())
+        pred = self.sessions[session].models[modelname].model.predict(dtm)
+        return ["negative" if i == 3 else 'positive' if i == 2 else "neutral" for i in pred]
+
 
 

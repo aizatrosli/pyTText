@@ -57,7 +57,7 @@ class TextTransform(object):
         self.pattern = pattern
         self.hashtag = hashtag
         self.mention = mention
-        self.vectorizer = None
+        self.dtm = None
         self.stopword = stopwords.words(lang)
 
     def process(self, df, textcol):
