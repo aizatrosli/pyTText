@@ -13,4 +13,6 @@ Compatible with any sklearn models as well high level Keras API *(keras.wrappers
 ```bash
 python pyttext.py
 ```
+### Demo with Google Colab ###
 
+[pyttext_demo.ipynb](https://colab.research.google.com/drive/1dEQiLfAi4YE2Z9kC1lzHdjQWnUSqIc8P?usp=sharing)

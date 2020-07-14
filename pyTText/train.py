@@ -42,11 +42,12 @@ class TTrain(object):
         self.sessions = {}
         self.model = None
 
-    def splitdata(self):
+    def splitdata(self, test=None):
         '''
         split data. if there is multiple session then split by session.
         :return:
         '''
+        self.testratio = test if test is not None else self.testratio
         for session, df in zip(self.sesslist, self.dflist):
             Xcol = df[[col for col in df.columns.tolist() if col not in [self.target, 'text']]]
             ycol = df[[self.target]]
@@ -70,7 +71,7 @@ class TTrain(object):
         if self.model is None and model is None:
             self.model = {
                 'GaussianNaiveBayes': {'model': GaussianNB(), 'params': {'var_smoothing': [1e-9, 1e-7]}},
-                'SVM': {'model': SVC(), 'params': {'kernel': ['rbf', 'poly'], 'C': [1.0, 1.5, 4]}},
+                'Support Vector Machines': {'model': SVC(), 'params': {'kernel': ['rbf', 'poly'], 'C': [1.0, 1.5, 4]}},
                 'MultiLayerPerceptron': {'model': MLPClassifier(),
                                          'params': {'activation': ['tanh', 'relu'], 'solver': ['sgd', 'adam'],
                                                     'alpha': [0.00001, 0.000001, 0.01]}},
