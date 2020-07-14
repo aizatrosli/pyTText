@@ -200,7 +200,7 @@ class TTrain(object):
 
     def load_session(self,picklename='ttsessions.pkl'):
         import pickle as pkl
-        with open(picklename, 'wb') as fp:
+        with open(picklename, 'rb') as fp:
             self.sessions = None
             self.sessions = pkl.load(fp)
             return self.sessions
@@ -213,7 +213,7 @@ class TInfer(object):
 
     def load_session(self,picklename='ttsessions.pkl'):
         import pickle as pkl
-        with open(picklename, 'wb') as fp:
+        with open(picklename, 'rb') as fp:
             self.sessions = None
             self.sessions = pkl.load(fp)
             return self.sessions
@@ -234,7 +234,12 @@ class TInfer(object):
         vec = vectorizer.transform(text)
         dtm = pd.DataFrame(vec.toarray(), columns=vectorizer.get_feature_names())
         pred = self.sessions[session].models[modelname].model.predict(dtm)
-        return ["negative" if i == 3 else 'positive' if i == 2 else "neutral" for i in pred]
+        preddf = pd.DataFrame()
+        preddf['session'] = session
+        preddf['model'] = modelname
+        preddf['text'] = text
+        preddf['sentiment'] = ["negative" if i == 3 else 'positive' if i == 2 else "neutral" for i in pred]
+        return preddf
 
 
 
