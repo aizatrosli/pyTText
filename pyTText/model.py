@@ -193,10 +193,12 @@ class TInfer(object):
             return self.sessions
 
     def predict(self, text, modelname, session=None):
+        if type(text) is str:
+            text = [text]
         if session is None:
             session = random.choice(list(self.sessions.keys()))
         vectorizer = self.sessions[session].dtm
-        vec = vectorizer.transform([text])
+        vec = vectorizer.transform(text)
         dtm = pd.DataFrame(vec.toarray(), columns=vectorizer.get_feature_names())
         pred = self.sessions[session].models[modelname].model.predict(dtm)
         return ["negative" if i == 3 else 'positive' if i == 2 else "neutral" for i in pred]

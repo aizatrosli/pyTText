@@ -148,7 +148,7 @@ class TextTransform(object):
             raise Exception('MF please run opinion score first!')
         vectorizer = CountVectorizer()
         vec = vectorizer.fit_transform(documents)
-        self.vectorizer = vectorizer
+        self.dtm = vectorizer
         dtm = pd.DataFrame(vec.toarray(), columns=vectorizer.get_feature_names())
         dtm = df[[self.target,"sentiment"]].merge(dtm, left_index=True, right_index=True, how="left")
         dtm["sentiment"] = dtm["sentiment"].map({"neutral" : 1,"positive" : 2,"negative" : 3})
