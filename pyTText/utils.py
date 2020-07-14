@@ -12,7 +12,7 @@ class TextLibrary(object):
         self.hashtag = r'#.*?(?=\s|$)'
         self.mention = r'@.*?(?=\s|$)'
         self.digit = r'\d+'
-        self.hyperlink = r'^https?:\/\/.*[\r\n]*'
+        #self.hyperlink = r'^https?:\/\/.*[\r\n]*'
         self.specialchar = r'\W'
         self.punctuation = r'[^\w\s]'
         self.underscore = r'_'
@@ -172,10 +172,6 @@ class Model(object):
 
     def __ne__(self, other):
         return not self.__eq__(other)
-
-    def __str__(self):
-        predict = '\n'.join(self.predict) if type(self.predict) is list else '\n'.join(self.predict.values.tolist())
-        return "[" + str(self.name) + "\n" + predict + "\n" + str(self.model) + "]"
 
 
 class Session(object):

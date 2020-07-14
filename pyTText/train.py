@@ -159,6 +159,8 @@ class TTrain(object):
             iarr.append(session+'_test')
             sarr.append(data.y_train['sentiment'].value_counts().to_dict())
             iarr.append(session+'_train')
-        return pd.DataFrame(sarr, index=iarr)
+        sdf = pd.DataFrame(sarr, index=iarr)
+        sdf = sdf.rename(columns={1: "neutral", 2: "positive", 3: "negative"})
+        return sdf
 
 
