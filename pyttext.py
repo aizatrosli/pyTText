@@ -2,6 +2,7 @@ import argparse,os,sys
 from pyTText.core import *
 from pyTText.model import *
 from pyTText.utils import *
+import getpass
 
 parser = argparse.ArgumentParser(description="pyTText: twitter sentiment analysis!")
 
@@ -40,8 +41,8 @@ def tweetdemo():
     username = input('Enter twitter username:')
     ti = TInfer()
     ti.load_session()
-    consumer_key = input('Enter twitter consumer_key api:')
-    consumer_secret = input('Enter twitter consumer_secret api:')
+    consumer_key = getpass.getpass('Enter twitter consumer_key api:')
+    consumer_secret = getpass.getpass('Enter twitter consumer_secret api:')
     ttweet = TTweet(consumer_key, consumer_secret)
     ttweet.usertweet(username, count=10)
 

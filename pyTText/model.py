@@ -84,7 +84,7 @@ class TTrain(object):
         else:
             self.model = model
 
-    def randomsearchtrain(self, model=None, n_jobs=None):
+    def gridsearchtrain(self, model=None, n_jobs=None):
         '''
         gridsearch for hyperparameter tuning
         :param model: please refer tu defaultmodel()
