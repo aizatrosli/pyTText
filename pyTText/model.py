@@ -84,11 +84,10 @@ class TTrain(object):
         else:
             self.model = model
 
-    def randomsearchtrain(self, model=None, n_iter=10, n_jobs=None):
+    def randomsearchtrain(self, model=None, n_jobs=None):
         '''
-        randomize for hyperparameter tuning
+        gridsearch for hyperparameter tuning
         :param model: please refer tu defaultmodel()
-        :param n_iter: iteration for each model
         :param n_jobs: cpu used for parallel compute. default None == 1 cpu, for all cpu usage please use -1
         :return:
         '''
@@ -102,7 +101,7 @@ class TTrain(object):
                 starttime = datetime.now()
                 self.sessions[session].models[name] = Model()
                 self.sessions[session].models[name].name = name
-                self.sessions[session].models[name].model = RandomizedSearchCV(model['model'], param_distributions=model['params'], n_iter=n_iter, n_jobs=n_jobs)
+                self.sessions[session].models[name].model = GridSearchCV(model['model'], param_grid=model['params'], n_jobs=n_jobs)
                 self.sessions[session].models[name].model.fit(self.sessions[session].X_train, self.sessions[session].y_train.values.ravel())
                 self.sessions[session].models[name].params = self.sessions[session].models[name].model.best_params_
                 self.sessions[session].models[name].predict = self.sessions[session].models[name].model.predict(self.sessions[session].X_test)

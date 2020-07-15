@@ -3,18 +3,7 @@ from pyTText.core import *
 from pyTText.model import *
 from pyTText.utils import *
 
-df = pd.read_csv(r'https://raw.githubusercontent.com/wimlds/election-data-hackathon/master/clinton-trump-tweets/data/tweets.csv')
-dft = df[[ 'handle', 'text', 'is_retweet', 'original_author', 'time', 'lang', 'retweet_count', 'favorite_count']]
-
-pat = TextLibrary()
-ttransform = TextTransform(pat.patternlist(), backup='oritext')
-ndf = ttransform.preprocess(dft)
-nndf = ttransform.opinionscore(ndf, remove='trump')
-nnndf = ttransform.tokenizer(nndf)
-tr = TTrain(nnndf, target='sentiment')
-tr.splitdata()
-tr.train()
-print(tr.sessions['task_tweet'].model)
+parser = argparse.ArgumentParser(description="pyTText: twitter sentiment analysis!")
 
 
 def demo():
@@ -34,6 +23,8 @@ def demo():
     print('{0}{1}{0}'.format('#' * 20, 'Creating DTM'))
     tokencol = ttransform.splituser(tweetscoredf)
     dtm = ttransform.dtm
+    tr = TTrain(tokencol, target='sentiment', testratio=0.25)
+    tr.splitdata(dtm=dtm)
     tr.summarysentiment()
     print('{0}{1}{0}'.format('#' * 20, 'Training Model'))
     tr.train()
@@ -45,7 +36,8 @@ def demo():
     print(ti.predict(text, bestmodel))
 
 
-def tweetdemo(username):
+def tweetdemo():
+    username = input('Enter twitter username:')
     ti = TInfer()
     ti.load_session()
     consumer_key = input('Enter twitter consumer_key api:')
@@ -57,3 +49,14 @@ def tweetdemo(username):
         for name, model in obj.models.items():
             pred = ti.predict(ttweet.text, model.name, sess)
             print(pred)
+
+
+group1 = parser.add_mutually_exclusive_group(required=True)
+group1.add_argument('--twitterdemo',action="store_true", help="Twitter live demo scraping.")
+group1.add_argument('--demo',action="store_false", help="Simple demo training, testing and inferencing.")
+args = parser.parse_args()
+
+if args.group1:
+    tweetdemo()
+elif not args.group1:
+    demo()
