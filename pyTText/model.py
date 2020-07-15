@@ -104,7 +104,7 @@ class TTrain(object):
                 self.sessions[session].models[name].name = name
                 self.sessions[session].models[name].model = RandomizedSearchCV(model['model'], param_distributions=model['params'], n_iter=n_iter, n_jobs=n_jobs)
                 self.sessions[session].models[name].model.fit(self.sessions[session].X_train, self.sessions[session].y_train.values.ravel())
-                self.sessions[session].models[name].params = self.sessions[session].model[name].model.best_params_
+                self.sessions[session].models[name].params = self.sessions[session].models[name].model.best_params_
                 self.sessions[session].models[name].predict = self.sessions[session].models[name].model.predict(self.sessions[session].X_test)
                 self.sessions[session].models[name].actual = self.sessions[session].y_test.values.ravel()
                 self.sessions[session].models[name].metric = self.metric(self.sessions[session].models[name].actual, self.sessions[session].models[name].predict)

@@ -31,4 +31,3 @@ class TTweet(object):
 
         return dft
 
-
