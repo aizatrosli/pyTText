@@ -2,7 +2,7 @@
 
 #### pyThoughtText ####
 
-Twitter sentiment analysis using lexicon and DTM. 
+Twitter sentiment analysis using opinion lexicon and DTM. 
 Compatible with any sklearn models as well high level Keras API *(keras.wrappers.scikit_learn)* and tensorflow 2.0 *(tf.estimator)*
 
 ### Requirements ###
@@ -25,7 +25,7 @@ optional arguments:
   --demo          Simple demo training, testing and inferencing.
 ```
 
-[![asciicast](https://asciinema.org/a/fXq9t1zwPGx6HiZmIRO1PV6Og.svg)](https://asciinema.org/a/fXq9t1zwPGx6HiZmIRO1PV6Og)
+[![asciicast](https://asciinema.org/a/347916.svg)](https://asciinema.org/a/347916)
 
 for more detail explaination, please refer [pyTText.md](pyTText.md).
 
