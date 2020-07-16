@@ -14,16 +14,16 @@ def demo():
     print('{0}{1}{0}'.format('#'*20,'Load demo tweet dataset'))
     df = pd.read_csv('./data/tweets.csv')
     dft = df[['handle', 'text', 'is_retweet', 'original_author', 'time', 'lang', 'retweet_count', 'favorite_count']]
-    print(tabulate(dft, headers='keys', tablefmt='psql'))
+    print(tabulate(dft.head(), headers='keys', tablefmt='psql'))
     print('{0}{1}{0}'.format('#' * 20, 'Preprocessing dataset'))
     tlib = TextLibrary()
     pattern = tlib.patternlist()
     ttransform = TextTransform(pattern, backup='oritext')
     tweetdf = ttransform.preprocess(dft)
-    print(tabulate(tweetdf, headers='keys', tablefmt='psql'))
+    print(tabulate(tweetdf.head(), headers='keys', tablefmt='psql'))
     print('{0}{1}{0}'.format('#' * 20, 'Scoring tweet using lexicon'))
     tweetscoredf = ttransform.opinionscore(tweetdf, remove='trump')
-    print(tabulate(tweetscoredf, headers='keys', tablefmt='psql'))
+    print(tabulate(tweetscoredf.head(), headers='keys', tablefmt='psql'))
     print('{0}{1}{0}'.format('#' * 20, 'Creating DTM'))
     tokencol = ttransform.splituser(tweetscoredf)
     dtm = ttransform.dtm
@@ -41,6 +41,43 @@ def demo():
     print(ti.predict(text, bestmodel))
 
 
+def demorefine():
+    print('{0}{1}{0}'.format('#'*20,'Load demo tweet dataset'))
+    df = pd.read_csv('./data/tweets.csv')
+    dft = df[['handle', 'text', 'is_retweet', 'original_author', 'time', 'lang', 'retweet_count', 'favorite_count']]
+    print(tabulate(dft.head(), headers='keys', tablefmt='psql'))
+    print('{0}{1}{0}'.format('#' * 20, 'Preprocessing dataset'))
+    tlib = TextLibrary()
+    pattern = tlib.patternlist()
+    ttransform = TextTransform(pattern, backup='oritext')
+    tweetdf = ttransform.preprocess(dft)
+    print(tabulate(tweetdf.head(), headers='keys', tablefmt='psql'))
+    print('{0}{1}{0}'.format('#' * 20, 'Scoring tweet using lexicon'))
+    tweetscoredf = ttransform.opinionscore(tweetdf, remove='trump')
+    print(tabulate(tweetscoredf.head(), headers='keys', tablefmt='psql'))
+    print('{0}{1}{0}'.format('#' * 20, 'Creating DTM'))
+    tokencol = ttransform.splituser(tweetscoredf)
+    dtm = ttransform.dtm
+    tr = TTrain(tokencol, target='sentiment', testratio=0.25)
+    tr.splitdata(dtm=dtm)
+    tr.summarysentiment()
+    print('{0}{1}{0}'.format('#' * 20, 'Training Model'))
+    tr.gridsearchtrain()
+    print(tr.summarymetric().to_markdown())
+    print('{0}{1}{0}'.format('#' * 20, 'Inferencing Model with Twitter feed!'))
+    username = input('Enter twitter username:')
+    ti = TInfer(tr.sessions)
+    consumer_key = getpass.getpass('Enter twitter consumer_key api:')
+    consumer_secret = getpass.getpass('Enter twitter consumer_secret api:')
+    ttweet = TTweet(consumer_key, consumer_secret)
+
+    for sess, obj in ti.sessions.items():
+        for name, model in obj.models.items():
+            ttweet.usertweet(sess, count=10)
+            pred = ti.predict(ttweet.text, model.name, sess)
+            print(tabulate(pred, headers='keys', tablefmt='psql'))
+
+
 def tweetdemo():
     username = input('Enter twitter username:')
     ti = TInfer()
@@ -53,9 +90,10 @@ def tweetdemo():
     for sess, obj in ti.sessions.items():
         for name, model in obj.models.items():
             pred = ti.predict(ttweet.text, model.name, sess)
-            print(pred.to_markdown())
+            print(tabulate(pred, headers='keys', tablefmt='psql'))
 
 
+parser.add_argument('--demoextended',action="store_true", help="Trump/Clinton dataset with GridSeach tuning as well Twitter live demo scraping.")
 group1 = parser.add_mutually_exclusive_group(required=True)
 group1.add_argument('--twitterdemo',action="store_true", help="Twitter live demo scraping.")
 group1.add_argument('--demo', action="store_false", help="Simple demo training, testing and inferencing.")
@@ -65,3 +103,5 @@ if args.twitterdemo:
     tweetdemo()
 elif not args.demo:
     demo()
+elif args.demoextended:
+    demorefine()
