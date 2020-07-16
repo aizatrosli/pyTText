@@ -29,11 +29,10 @@ def demo():
     dtm = ttransform.dtm
     tr = TTrain(tokencol, target='sentiment', testratio=0.25)
     tr.splitdata(dtm=dtm)
-    tr.summarysentiment()
+    print(tabulate(tr.summarysentiment(), headers='keys', tablefmt='psql'))
     print('{0}{1}{0}'.format('#' * 20, 'Training Model'))
     tr.train()
-
-    print(tr.summarymetric().to_markdown())
+    print(tabulate(tr.summarymetric(), headers='keys', tablefmt='psql'))
     print('{0}{1}{0}'.format('#' * 20, 'Inferencing Model'))
     ti = TInfer(tr.sessions)
     text = input("Enter any text/sentence: ")
@@ -60,11 +59,11 @@ def demorefine():
     dtm = ttransform.dtm
     tr = TTrain(tokencol, target='sentiment', testratio=0.25)
     tr.splitdata(dtm=dtm)
-    tr.summarysentiment()
+    print(tabulate(tr.summarysentiment(), headers='keys', tablefmt='psql'))
     tr.save_session()
     print('{0}{1}{0}'.format('#' * 20, 'Training Model'))
     tr.train()
-    print(tr.summarymetric().to_markdown())
+    print(tabulate(tr.summarymetric(), headers='keys', tablefmt='psql'))
     print('{0}{1}{0}'.format('#' * 20, 'Inferencing Model with Twitter feed!'))
     ti = TInfer(tr.sessions)
     consumer_key = getpass.getpass('Enter twitter consumer_key api:')
