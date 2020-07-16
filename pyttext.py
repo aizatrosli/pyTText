@@ -80,7 +80,9 @@ def demorefine():
 def tweetdemo():
     username = input('Enter twitter username:')
     ti = TInfer()
-    ti.load_session()
+    print('{0}{1}{0}'.format('#' * 20, 'Loading pretrained data!'))
+    ti.load_session('./session/ttsessions.pkl')
+    print('{0}{1}{0}'.format('#' * 20, 'Twitter scraping!'))
     consumer_key = getpass.getpass('Enter twitter consumer_key api:')
     consumer_secret = getpass.getpass('Enter twitter consumer_secret api:')
     ttweet = TTweet(consumer_key, consumer_secret)
