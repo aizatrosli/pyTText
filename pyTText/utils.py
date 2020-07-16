@@ -60,7 +60,7 @@ class TextTransform(object):
         self.dtm = None
         self.stopword = stopwords.words(lang)
 
-    def process(self, df, textcol):
+    def process(self, df, textcol, retweet):
         '''
         process dataframe
         :param df: target dataframe
@@ -80,10 +80,12 @@ class TextTransform(object):
         for tag, pat in self.pattern.items():
             df[textcol] = df[textcol].str.replace(pat, " ")
         df[textcol] = df[textcol].progress_apply(lambda x: " ".join([i for i in x.split() if i not in self.stopword]))
+        if not retweet:
+            df = df[df["is_retweet"] == False].reset_index()
         return df
 
-    def preprocess(self, df):
-        return self.process(df.copy(), textcol=self.target)
+    def preprocess(self, df, retweet=False):
+        return self.process(df.copy(), textcol=self.target, retweet=retweet)
 
     def sentencelookup(self, df, scorename, scoreset):
         '''

@@ -17,10 +17,10 @@ def demo():
     pattern = tlib.patternlist()
     ttransform = TextTransform(pattern, backup='oritext')
     tweetdf = ttransform.preprocess(dft)
-    print(tweetdf.head())
+    print(tweetdf.head().to_markdown())
     print('{0}{1}{0}'.format('#' * 20, 'Scoring tweet using lexicon'))
     tweetscoredf = ttransform.opinionscore(tweetdf, remove='trump')
-    print(tweetscoredf.head())
+    print(tweetscoredf.head().to_markdown())
     print('{0}{1}{0}'.format('#' * 20, 'Creating DTM'))
     tokencol = ttransform.splituser(tweetscoredf)
     dtm = ttransform.dtm
@@ -29,7 +29,7 @@ def demo():
     tr.summarysentiment()
     print('{0}{1}{0}'.format('#' * 20, 'Training Model'))
     tr.train()
-    print(pd.DataFrame(tr.model))
+    print(pd.DataFrame(tr.model).to_markdown())
     print('{0}{1}{0}'.format('#' * 20, 'Inferencing Model'))
     ti = TInfer(tr.sessions)
     text = input("Enter any text/sentence: ")
@@ -49,7 +49,7 @@ def tweetdemo():
     for sess, obj in ti.sessions.items():
         for name, model in obj.models.items():
             pred = ti.predict(ttweet.text, model.name, sess)
-            print(pred)
+            print(pred.to_markdown())
 
 
 group1 = parser.add_mutually_exclusive_group(required=True)
@@ -57,7 +57,7 @@ group1.add_argument('--twitterdemo',action="store_true", help="Twitter live demo
 group1.add_argument('--demo',action="store_false", help="Simple demo training, testing and inferencing.")
 args = parser.parse_args()
 
-if args.group1:
+if args.twitterdemo:
     tweetdemo()
-elif not args.group1:
+elif not args.demo:
     demo()

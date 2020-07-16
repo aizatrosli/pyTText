@@ -7,7 +7,7 @@ Compatible with any sklearn models as well high level Keras API *(keras.wrappers
 
 ### Requirements ###
 
-* pip install nltk, tqdm, bokeh, tweepy
+* pip install nltk, tqdm, tabulate, tweepy
 
 ### How to run ###
 ```bash
