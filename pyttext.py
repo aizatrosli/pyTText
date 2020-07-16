@@ -65,7 +65,6 @@ def demorefine():
     tr.gridsearchtrain()
     print(tr.summarymetric().to_markdown())
     print('{0}{1}{0}'.format('#' * 20, 'Inferencing Model with Twitter feed!'))
-    username = input('Enter twitter username:')
     ti = TInfer(tr.sessions)
     consumer_key = getpass.getpass('Enter twitter consumer_key api:')
     consumer_secret = getpass.getpass('Enter twitter consumer_secret api:')
@@ -94,14 +93,16 @@ def tweetdemo():
 
 
 parser.add_argument('--demoextended',action="store_true", help="Trump/Clinton dataset with GridSeach tuning as well Twitter live demo scraping.")
-group1 = parser.add_mutually_exclusive_group(required=True)
-group1.add_argument('--twitterdemo',action="store_true", help="Twitter live demo scraping.")
-group1.add_argument('--demo', action="store_false", help="Simple demo training, testing and inferencing.")
+parser.add_argument('--twitterdemo',action="store_true", help="Twitter live demo scraping.")
+parser.add_argument('--demo', action="store_true", help="Simple demo training, testing and inferencing.")
+
 args = parser.parse_args()
 
 if args.twitterdemo:
     tweetdemo()
-elif not args.demo:
+elif args.demo:
     demo()
 elif args.demoextended:
     demorefine()
+else:
+    print('Invalid Input. Run --help for more info')
