@@ -27,7 +27,7 @@ optional arguments:
 
 [![asciicast](https://asciinema.org/a/347916.svg)](https://asciinema.org/a/347916)
 
-for more detail explaination, please refer [pyTText.md](pyTText.md).
+for more detail explaination, please refer [pyTText.md](pyTText.md) or on our blog post [Sentiment analysis on Trump and Hillary tweets](https://abualfateh2901.wixsite.com/afsaanalytics/post/sentiment-analysis-on-trump-and-hillary-tweets).
 
 ### Demo with Google Colab ###
 
